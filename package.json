@@ -1,0 +1,30 @@
+{
+  "name": "vasttrafik-lovelace-card",
+  "displayName": "Västtrafik Home Assistant Card",
+  "author": "Carl Lindman",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "source": "src/index.ts",
+  "module": "dist/vasttrafik-lovelace-card.js",
+  "targets": {
+    "module": {
+      "includeNodeModules": true
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "watch": "nodemon --watch src --ext ts,js,css,html --exec ./deploy.sh"
+  },
+  "dependencies": {
+    "custom-card-helpers": "1.9.0",
+    "home-assistant-js-websocket": "9.4.0",
+    "lit": "3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "3.1.9",
+    "typescript": "5.7.3",
+    "vite": "6.0.7"
+  }
+}
