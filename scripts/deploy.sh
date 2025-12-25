@@ -17,32 +17,32 @@ log() {
     YELLOW='\033[1;33m'
     RED='\033[0;31m'
     NC='\033[0m' # No Color
-
+    
     # Determine log level based on message content (optional)
     case "$1" in
         *"Error:"*)
             COLOR=$RED
-            ;;
+        ;;
         *"Successfully"*|*"completed"*)
             COLOR=$GREEN
-            ;;
+        ;;
         *"Deploying"*|*"Running"*|*"Uploading"*)
             COLOR=$BLUE
-            ;;
+        ;;
         *)
             COLOR=$NC
-            ;;
+        ;;
     esac
-
+    
     # Log message with timestamp and color
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') : ${COLOR}$1${NC}" | tee -a logs/deploy.log
 }
 
-# Load environment variables from .env
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+# Load environment variables from .env.development
+if [ -f .env.development ]; then
+    export $(grep -v '^#' .env.development | xargs)
 else
-    log ".env file not found. Exiting."
+    log ".env.development file not found. Exiting."
     exit 1
 fi
 
@@ -67,7 +67,7 @@ display_header() {
     log "Environment Variables:"
     log "  FTP_HOST: $FTP_HOST"
     log "  FTP_USER: $FTP_USER"
-    log "  FTP_PASS: ***"  
+    log "  FTP_PASS: ***"
     log "  BUILD_PATH: $BUILD_PATH"
     log "  FULL_BUILD_PATH: $FULL_BUILD_PATH"
     log "  REMOTE_DIR: $REMOTE_DIR"
@@ -78,20 +78,20 @@ display_header() {
 display_header
 
 log "Running the build script..."
-pnpm run --silent build 
+pnpm run --silent build
 log ""
 
 # Get the file name from the path
 BUILT_FILE_PATH=$(find "$FULL_BUILD_PATH" -type f -name "$PATTERN" -print -quit)
 BUILT_FILE_NAME=$(basename "$BUILT_FILE_PATH")
-RESOURCE_URL="/local/vasttrafik-lovelace-card/$BUILT_FILE_NAME"
+RESOURCE_URL="/local/vasttrafik-card/$BUILT_FILE_NAME"
 
 log "Uploading $BUILT_FILE_PATH to $REMOTE_DIR on $FTP_HOST..."
 
 lftp -u "$FTP_USER","$FTP_PASS" ftp://$FTP_HOST <<EOF
-    set cmd:fail-exit no       
+    set cmd:fail-exit no
     mkdir -p -f "$REMOTE_DIR"
-    set cmd:fail-exit yes      
+    set cmd:fail-exit yes
     cd "$REMOTE_DIR"
     put "$BUILT_FILE_PATH"
     bye
